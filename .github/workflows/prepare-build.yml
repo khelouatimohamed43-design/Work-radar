@@ -1,0 +1,59 @@
+name: WorkRadar v3.3 Android Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract WorkRadar source
+        run: |
+          rm -rf extracted
+          mkdir extracted
+
+          unzip -q WorkRadar_v3_3_release_candidate.zip -d extracted
+
+          ROOT="$(find extracted -type f -name pubspec.yaml -print -quit | xargs -r dirname)"
+
+          if [ -z "$ROOT" ]; then
+            echo "ERROR: pubspec.yaml not found in release ZIP"
+            echo "ZIP contents:"
+            find extracted -maxdepth 5 -type f | head -100
+            exit 1
+          fi
+
+          echo "Flutter project root: $ROOT"
+
+          cp -a "$ROOT"/. .
+
+          rm -rf extracted
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release --android-skip-build-dependency-validation
+
+      - name: Build App Bundle
+        run: flutter build appbundle --release --android-skip-build-dependency-validation
+
+      - name: Upload Android builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorkRadar-v3.3-Android
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
