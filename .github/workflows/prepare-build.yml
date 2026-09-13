@@ -18,35 +18,31 @@ jobs:
         run: |
           rm -rf extracted
           mkdir extracted
-          
           unzip -q WorkRadar_v3_3_release_candidate.zip -d extracted
-
+          
           ROOT="$(find extracted -type f -name pubspec.yaml -print -quit | xargs -r dirname)"
-
           if [ -z "$ROOT" ]; then
             echo "ERROR: pubspec.yaml not found in release ZIP"
-            echo "ZIP contents:"
-            find extracted -maxdepth 5
             exit 1
           fi
-
-          echo "Found project root at: $ROOT"
+          
           cp -a "$ROOT"/. .
           rm -rf extracted
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.19.0'
           channel: stable
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --verbose --android-skip-build-dependency-validation
+        run: flutter build apk --release --pub
 
       - name: Build App Bundle
-        run: flutter build appbundle --release --verbose --android-skip-build-dependency-validation
+        run: flutter build appbundle --release --pub
 
       - name: Upload Android builds
         uses: actions/upload-artifact@v4
