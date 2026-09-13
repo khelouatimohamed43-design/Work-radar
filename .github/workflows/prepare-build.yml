@@ -35,6 +35,17 @@ jobs:
           flutter-version: '3.19.0'
           channel: stable
 
+      - name: Upgrade Gradle Wrapper Version
+        run: |
+          PROPS="android/gradle/wrapper/gradle-wrapper.properties"
+          if [ -f "$PROPS" ]; then
+            sed -i 's/gradle-7\.[0-9]\(\.[0-9]\)\?-all\.zip/gradle-8.9-all.zip/g' "$PROPS"
+            sed -i 's/gradle-7\.[0-9]\(\.[0-9]\)\?-bin\.zip/gradle-8.9-bin.zip/g' "$PROPS"
+            echo "Successfully updated gradle-wrapper.properties to 8.9"
+          else
+            echo "gradle-wrapper.properties not found at expected path"
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
