@@ -44,6 +44,14 @@ jobs:
           echo "zipStoreBase=GRADLE_USER_HOME" >> android/gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
 
+      - name: Fix Flutter Version Code Property
+        run: |
+          BUILD_FILE="android/app/build.gradle"
+          if [ -f "$BUILD_FILE" ]; then
+            sed -i 's/flutter.versionCode/1/g' "$BUILD_FILE"
+            sed -i 's/flutter.versionName/"1.0"/g' "$BUILD_FILE"
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
