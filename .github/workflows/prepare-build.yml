@@ -3,9 +3,6 @@ name: WorkRadar v3.3 Android Build
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,57 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract WorkRadar source
+      - name: Simple Check
         run: |
-          rm -rf extracted
-          mkdir extracted
-          unzip -q WorkRadar_v3_3_release_candidate.zip -d extracted
-          
-          ROOT="$(find extracted -type f -name pubspec.yaml -print -quit | xargs -r dirname)"
-          if [ -z "$ROOT" ]; then
-            echo "ERROR: pubspec.yaml not found in release ZIP"
-            exit 1
-          fi
-          
-          cp -a "$ROOT/." .
-          rm -rf extracted
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.0'
-          channel: stable
-
-      - name: Fix Gradle Wrapper Properties
-        run: |
-          mkdir -p android/gradle/wrapper
-          echo "distributionBase=GRADLE_USER_HOME" > android/gradle/wrapper/gradle-wrapper.properties
-          echo "distributionPath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
-          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.9-bin.zip" >> android/gradle/wrapper/gradle-wrapper.properties
-          echo "zipStoreBase=GRADLE_USER_HOME" >> android/gradle/wrapper/gradle-wrapper.properties
-          echo "zipStorePath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
-
-      - name: Fix Flutter Version Code Property
-        run: |
-          BUILD_FILE="android/app/build.gradle"
-          if [ -f "$BUILD_FILE" ]; then
-            sed -i 's/flutter.versionCode/1/g' "$BUILD_FILE"
-            sed -i 's/flutter.versionName/"1.0"/g' "$BUILD_FILE"
-          fi
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release --pub
-
-      - name: Build App Bundle
-        run: flutter build appbundle --release --pub
-
-      - name: Upload Android builds
-        uses: actions/upload-artifact@v4
-        with:
-          name: WorkRadar-v3.3-Android
-          path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            build/app/outputs/bundle/release/app-release.aab
+          echo "Checking repository files..."
+          ls -la
