@@ -11,7 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Simple Check
-        run: |
-          echo "Checking repository files..."
-          ls -la
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+
+      - name: Check Flutter Version
+        run: flutter --version
