@@ -41,19 +41,17 @@ jobs:
           echo "zipStoreBase=GRADLE_USER_HOME" >> android/gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
 
-      - name: Fix Flutter Version Code Property
+      - name: Create Local Properties
         run: |
-          BUILD_FILE="android/app/build.gradle"
-          if [ -f "$BUILD_FILE" ]; then
-            sed -i 's/flutter.versionCode/1/g' "$BUILD_FILE"
-            sed -i 's/flutter.versionName/1.0/g' "$BUILD_FILE"
-          fi
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          echo "flutter.versionCode=1" >> android/local.properties
+          echo "flutter.versionName=3.3" >> android/local.properties
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --pub
+        run: flutter build apk --release --no-pub
 
       - name: Upload Android builds
         uses: actions/upload-artifact@v4
