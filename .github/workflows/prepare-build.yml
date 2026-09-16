@@ -1,3 +1,4 @@
+
 name: WorkRadar v3.3 Android Build
 
 on:
@@ -17,5 +18,18 @@ jobs:
           flutter-version: '3.19.0'
           channel: 'stable'
 
-      - name: Check Flutter Version
-        run: flutter --version
+      - name: Extract WorkRadar source
+        run: |
+          rm -rf extracted
+          mkdir extracted
+          unzip -q WorkRadar_v3_3_release_candidate.zip -d extracted
+          
+          ROOT="$(find extracted -type f -name pubspec.yaml -print -quit | xargs -r dirname)"
+          if [ -z "$ROOT" ]; then
+            echo "ERROR: pubspec.yaml not found in release ZIP"
+            exit 1
+          fi
+          
+          cp -a "$ROOT/." .
+          rm -rf extracted
+          echo "Source extracted successfully!"
