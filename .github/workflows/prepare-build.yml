@@ -18,15 +18,21 @@ jobs:
         run: |
           rm -rf extracted
           mkdir extracted
+
           unzip -q WorkRadar_v3_3_release_candidate.zip -d extracted
-          
+
           ROOT="$(find extracted -type f -name pubspec.yaml -print -quit | xargs -r dirname)"
+
           if [ -z "$ROOT" ]; then
             echo "ERROR: pubspec.yaml not found in release ZIP"
+            find extracted -maxdepth 5 -type f | head -100
             exit 1
           fi
-          
+
+          echo "Flutter project root: $ROOT"
+
           cp -a "$ROOT"/. .
+
           rm -rf extracted
 
       - name: Setup Flutter
@@ -35,13 +41,12 @@ jobs:
           flutter-version: '3.19.0'
           channel: stable
 
-      - name: Force Upgrade Gradle Wrapper Everywhere
+      - name: Setup Gradle 8.9
         run: |
-          echo "Searching and updating all gradle-wrapper.properties files..."
-          find . -name "gradle-wrapper.properties" | while read file; do
-            echo "Updating $file"
-            echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.9-all.zip" > "$file"
-          done
+          wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d "$HOME"
+          echo "$HOME/gradle-8.9/bin" >> "$GITHUB_PATH"
+          "$HOME/gradle-8.9/bin/gradle" --version
 
       - name: Install dependencies
         run: flutter pub get
