@@ -41,11 +41,16 @@ jobs:
           echo "zipStoreBase=GRADLE_USER_HOME" >> android/gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> android/gradle/wrapper/gradle-wrapper.properties
 
-      - name: Create Local Properties
+      - name: Force Overwrite Gradle Versioning
         run: |
-          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          echo "flutter.versionCode=1" >> android/local.properties
-          echo "flutter.versionName=3.3" >> android/local.properties
+          BUILD_FILE="android/app/build.gradle"
+          if [ -f "$BUILD_FILE" ]; then
+            # استبدال كامل لأسطر الإصدار المسببة للمشكل بقيم ثابتة مباشرة
+            sed -i 's/versionCode.*/versionCode 1/g' "$BUILD_FILE"
+            sed -i 's/versionName.*/versionName "3.3"/g' "$BUILD_FILE"
+            sed -i 's/flutter.versionCode/1/g' "$BUILD_FILE"
+            sed -i 's/flutter.versionName/"3.3"/g' "$BUILD_FILE"
+          fi
 
       - name: Install dependencies
         run: flutter pub get
